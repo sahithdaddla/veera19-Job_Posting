@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job Opportunity | TalentHive</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --gray: #6c757d;
+            --gradient: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            color: var(--dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            box-shadow: 2px 1px 8px rgba(0, 0, 0, 0.432);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.25rem;
+            color: white;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            display: inline-block;
+        }
+        
+        .subtitle {
+            color: white;
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+        
+        .job-form {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+        
+        label i {
+            color: var(--accent);
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .required::after {
+            content: " *";
+            color: var(--warning);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.85rem 1.25rem;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #fff;
+            color: var(--dark);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+        }
+        
+        textarea {
+            min-height: 180px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+        
+        .checkbox-group:hover {
+            background-color: #f8fafc;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-right: 0.75rem;
+            accent-color: var(--accent);
+            width: 18px;
+            height: 18px;
+        }
+        
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-weight: 500;
+            color: var(--dark);
+            flex: 1;
+        }
+        
+        .salary-fields {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .salary-fields select {
+            flex: 1;
+        }
+        
+        .salary-fields input {
+            flex: 2;
+        }
+        
+        .salary-fields span {
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 1.75rem;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-block {
+            display: flex;
+            width: 100%;
+        }
+        
+        .btn-view-jobs {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            margin-top: 1rem;
+        }
+        
+        .btn-view-jobs:hover {
+            background: #f8f9fa;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            box-shadow: none;
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .error-message {
+            color: var(--warning);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .input-error {
+            border-color: var(--warning);
+        }
+        
+        .input-error:focus {
+            box-shadow: 0 0 0 3px rgba(247, 37, 133, 0.2);
+        }
+        
+        .jobs-container {
+            margin-top: 3rem;
+        }
+        
+        .jobs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .jobs-title {
+            font-size: 1.75rem;
+            color: var(--dark);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .jobs-title i {
+            color: var(--accent);
+        }
+        
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.75rem;
+        }
+        
+        .job-card {
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            padding: 1.75rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(67, 97, 238, 0.2);
+        }
+        
+        .job-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: white;
+            padding: 0.25rem;
+        }
+        
+        .job-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        .job-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .job-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #f8f9fa;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+        }
+        
+        .job-meta i {
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+        
+        .job-details {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+        
+        .job-details.show {
+            display: flex;
+        }
+        
+        .job-description {
+            color: var(--dark);
+            line-height: 1.7;
+        }
+        
+        .job-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+        
+        .skill-tag {
+            background-color: #e9ecef;
+            color: var(--dark);
+            padding: 0.4rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .skill-tag i {
+            font-size: 0.7rem;
+            color: var(--accent);
+        }
+        
+        .job-benefits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #e2e8f0;
+        }
+        
+        .benefit-tag {
+            background-color: #f0f7ff;
+            color: var(--primary);
+            padding: 0.4rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        
+        .benefit-tag i {
+            font-size: 0.8rem;
+            color: var(--success);
+        }
+        
+        .job-salary {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .job-salary i {
+            color: var(--success);
+        }
+        
+        .no-jobs {
+            text-align: center;
+            color: var(--gray);
+            padding: 3rem;
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px dashed #e2e8f0;
+        }
+        
+        .no-jobs i {
+            font-size: 2.5rem;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+        
+        .no-jobs p {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .no-jobs .btn {
+            margin-top: 1.5rem;
+            width: auto;
+            display: inline-flex;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #cbd5e0;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .checkbox-group input[type="checkbox"]:checked {
+            background-color: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .checkbox-group input[type="checkbox"]:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            color: white;
+            font-size: 0.7rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .job-form {
+                padding: 1.75rem;
+            }
+            
+            .salary-fields {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .salary-fields select,
+            .salary-fields input {
+                width: 100%;
+            }
+            
+            .jobs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            animation: fadeIn 0.4s ease forwards;
+            opacity: 0;
+        }
+        
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+        .form-group:nth-child(6) { animation-delay: 0.6s; }
+        .form-group:nth-child(7) { animation-delay: 0.7s; }
+        .form-group:nth-child(8) { animation-delay: 0.8s; }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .btn[type="submit"] {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header style="width: 100%; text-align: center; margin-bottom: 20px; padding: 20px 0; position: relative; background: linear-gradient(135deg, #2c3e50, #3498db); color: white; padding: 20px;">
+            <h1>Post a Job Opportunity</h1>
+            <p class="subtitle">Reach thousands of qualified candidates by posting your job opening on our platform.</p>
+        </header>
+        
+        <form id="jobPostingForm" class="job-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="jobTitle" class="required">
+                        <i class="fas fa-heading"></i>
+                        Job Title
+                    </label>
+                    <input type="text" id="jobTitle" name="jobTitle" placeholder="e.g. Senior Frontend Developer" required>
+                    <div class="error-message" id="jobTitleError">Job title must start with a capital letter and contain only single spaces</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="jobType" class="required">
+                        <i class="fas fa-briefcase"></i>
+                        Job Type
+                    </label>
+                    <select id="jobType" name="jobType" required>
+                        <option value="">Select job type</option>
+                        <option value="full-time">Full-time</option>
+                        <option value="part-time">Part-time</option>
+                        <option value="contract">Contract</option>
+                        <option value="temporary">Temporary</option>
+                        <option value="internship">Internship</option>
+                        <option value="remote">Remote</option>
+                    </select>
+                    <div class="error-message" id="jobTypeError">Please select a job type</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="location" class="required">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Location
+                    </label>
+                    <input type="text" id="location" name="location" placeholder="e.g. Bangalore" required>
+                    <div class="error-message" id="locationError">Location must start with a capital letter and contain only single spaces</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="experienceLevel" class="required">
+                        <i class="fas fa-user-tie"></i>
+                        Experience Level
+                    </label>
+                    <select id="experienceLevel" name="experienceLevel" required>
+                        <option value="">Select experience level</option>
+                        <option value="internship">Internship</option>
+                        <option value="entry-level">Entry Level</option>
+                        <option value="mid-level">Mid Level</option>
+                        <option value="senior-level">Senior Level</option>
+                        <option value="director">Director</option>
+                        <option value="executive">Executive</option>
+                    </select>
+                    <div class="error-message" id="experienceLevelError">Please select an experience level</div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label>
+                        <i class="fas fa-money-bill-wave"></i>
+                        Salary Range (₹)
+                    </label>
+                    <div class="salary-fields">
+                        <input type="number" id="salaryMin" name="salaryMin" placeholder="Minimum salary">
+                        <span>to</span>
+                        <input type="number" id="salaryMax" name="salaryMax" placeholder="Maximum salary">
+                        <select id="salaryPeriod" name="salaryPeriod">
+                            <option value="">Select period</option>
+                            <option value="year">Per Year</option>
+                            <option value="month">Per Month</option>
+                            <option value="week">Per Week</option>
+                            <option value="hour">Per Hour</option>
+                        </select>
+                    </div>
+                    <div class="error-message" id="salaryError">Maximum salary must be greater than minimum</div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="jobDescription" class="required">
+                        <i class="fas fa-file-alt"></i>
+                        Job Description
+                    </label>
+                    <textarea id="jobDescription" name="jobDescription" placeholder="Describe the responsibilities, requirements, and benefits of this position..." required></textarea>
+                    <div class="error-message" id="jobDescriptionError">Description must start with a capital letter, contain only single spaces, and include meaningful text</div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label>
+                        <i class="fas fa-gift"></i>
+                        Benefits (select all that apply)
+                    </label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="healthInsurance" name="benefits" value="healthInsurance">
+                        <label for="healthInsurance">
+                            <i class="fas fa-heartbeat" style="color: #f72585;"></i>
+                            Health Insurance
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="dentalInsurance" name="benefits" value="dentalInsurance">
+                        <label for="dentalInsurance">
+                            <i class="fas fa-tooth" style="color: #4cc9f0;"></i>
+                            Dental Insurance
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="retirementPlan" name="benefits" value="retirementPlan">
+                        <label for="retirementPlan">
+                            <i class="fas fa-piggy-bank" style="color: #4895ef;"></i>
+                            Retirement Plan
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="paidTimeOff" name="benefits" value="paidTimeOff">
+                        <label for="paidTimeOff">
+                            <i class="fas fa-umbrella-beach" style="color: #3f37c9;"></i>
+                            Paid Time Off
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="flexibleSchedule" name="benefits" value="flexibleSchedule">
+                        <label for="flexibleSchedule">
+                            <i class="fas fa-clock" style="color: #4361ee;"></i>
+                            Flexible Schedule
+                        </label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="remoteWork" name="benefits" value="remoteWork">
+                        <label for="remoteWork">
+                            <i class="fas fa-laptop-house" style="color: #7209b7;"></i>
+                            Remote Work Options
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="skillsRequired">
+                        <i class="fas fa-code"></i>
+                        Skills Required (comma separated)
+                    </label>
+                    <input type="text" id="skillsRequired" name="skillsRequired" placeholder="e.g. JavaScript, React, Node.js, CSS">
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-block">
+                <i class="fas fa-paper-plane"></i>
+                Post Job Opportunity
+            </button>
+        </form>
+        
+        <div class="jobs-container">
+            <div class="jobs-header">
+                <h2 class="jobs-title">
+                    <i class="fas fa-briefcase"></i>
+                    Recently Posted Jobs
+                </h2>
+            </div>
+            <div class="jobs-grid" id="jobsGrid">
+                <div class="no-jobs">
+                    <i class="fas fa-briefcase"></i>
+                    <p>No jobs posted yet</p>
+                    <p class="subtitle">Submit the form above to post your first job opportunity</p>
+                    <button class="btn btn-view-jobs">
+                        <i class="fas fa-arrow-up"></i>
+                        Go to Form
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchJobs();
+            
+            // Add click handler for "Go to Form" button
+            document.querySelector('.btn-view-jobs')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('jobPostingForm').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+
+            // Validation regex patterns
+            const capitalFirstLetter = /^[A-Z]/;
+            const singleSpace = /^([A-Za-z0-9]+[ ]{0,1})*[A-Za-z0-9]+$/;
+            const containsText = /[A-Za-z]/;
+
+            // Real-time validation for job title
+            const jobTitle = document.getElementById('jobTitle');
+            jobTitle.addEventListener('input', function() {
+                validateField(jobTitle, 'jobTitleError', 'Job title must start with a capital letter and contain only single spaces');
+            });
+
+            // Real-time validation for location
+            const location = document.getElementById('location');
+            location.addEventListener('input', function() {
+                validateField(location, 'locationError', 'Location must start with a capital letter and contain only single spaces');
+            });
+
+            // Real-time validation for description
+            const jobDescription = document.getElementById('jobDescription');
+            jobDescription.addEventListener('input', function() {
+                validateDescription(jobDescription, 'jobDescriptionError', 
+                    'Description must start with a capital letter, contain only single spaces, and include meaningful text');
+            });
+
+            function validateField(field, errorId, errorMessage) {
+                const value = field.value.trim();
+                const errorElement = document.getElementById(errorId);
+                
+                if (!value) {
+                    field.classList.add('input-error');
+                    errorElement.style.display = 'block';
+                    errorElement.textContent = 'This field cannot be empty';
+                    return false;
+                }
+                
+                if (!capitalFirstLetter.test(value) || !singleSpace.test(value)) {
+                    field.classList.add('input-error');
+                    errorElement.style.display = 'block';
+                    errorElement.textContent = errorMessage;
+                    return false;
+                }
+
+                field.classList.remove('input-error');
+                errorElement.style.display = 'none';
+                return true;
+            }
+
+            function validateDescription(field, errorId, errorMessage) {
+                const value = field.value.trim();
+                const errorElement = document.getElementById(errorId);
+                
+                if (!value) {
+                    field.classList.add('input-error');
+                    errorElement.style.display = 'block';
+                    errorElement.textContent = 'This field cannot be empty';
+                    return false;
+                }
+
+                if (!capitalFirstLetter.test(value) || 
+                    !singleSpace.test(value) || 
+                    !containsText.test(value)) {
+                    field.classList.add('input-error');
+                    errorElement.style.display = 'block';
+                    errorElement.textContent = errorMessage;
+                    return false;
+                }
+
+                field.classList.remove('input-error');
+                errorElement.style.display = 'none';
+                return true;
+            }
+        });
+
+        document.getElementById('jobPostingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            let isValid = true;
+            const jobTitle = document.getElementById('jobTitle');
+            const jobType = document.getElementById('jobType');
+            const location = document.getElementById('location');
+            const experienceLevel = document.getElementById('experienceLevel');
+            const salaryMin = document.getElementById('salaryMin').value;
+            const salaryMax = document.getElementById('salaryMax').value;
+            const salaryPeriod = document.getElementById('salaryPeriod');
+            const jobDescription = document.getElementById('jobDescription');
+
+            // Validation regex patterns
+            const capitalFirstLetter = /^[A-Z]/;
+            const singleSpace = /^([A-Za-z0-9]+[ ]{0,1})*[A-Za-z0-9]+$/;
+            const containsText = /[A-Za-z]/;
+
+            // Reset error states
+            [jobTitle, jobType, location, experienceLevel, jobDescription].forEach(field => {
+                field.classList.remove('input-error');
+                document.getElementById(`${field.id}Error`).style.display = 'none';
+            });
+            document.getElementById('salaryError').style.display = 'none';
+
+            // Validate job title
+            if (!jobTitle.value.trim()) {
+                jobTitle.classList.add('input-error');
+                document.getElementById('jobTitleError').style.display = 'block';
+                document.getElementById('jobTitleError').textContent = 'This field cannot be empty';
+                isValid = false;
+            } else if (!capitalFirstLetter.test(jobTitle.value.trim()) || !singleSpace.test(jobTitle.value.trim())) {
+                jobTitle.classList.add('input-error');
+                document.getElementById('jobTitleError').style.display = 'block';
+                document.getElementById('jobTitleError').textContent = 
+                    'Job title must start with a capital letter and contain only single spaces';
+                isValid = false;
+            }
+
+            // Validate job type
+            if (!jobType.value) {
+                jobType.classList.add('input-error');
+                document.getElementById('jobTypeError').style.display = 'block';
+                isValid = false;
+            }
+
+            // Validate location
+            if (!location.value.trim()) {
+                location.classList.add('input-error');
+                document.getElementById('locationError').style.display = 'block';
+                document.getElementById('locationError').textContent = 'This field cannot be empty';
+                isValid = false;
+            } else if (!capitalFirstLetter.test(location.value.trim()) || !singleSpace.test(location.value.trim())) {
+                location.classList.add('input-error');
+                document.getElementById('locationError').style.display = 'block';
+                document.getElementById('locationError').textContent = 
+                    'Location must start with a capital letter and contain only single spaces';
+                isValid = false;
+            }
+
+            // Validate experience level
+            if (!experienceLevel.value) {
+                experienceLevel.classList.add('input-error');
+                document.getElementById('experienceLevelError').style.display = 'block';
+                isValid = false;
+            }
+
+            // Validate salary
+            if (salaryMin && salaryMax && Number(salaryMax) <= Number(salaryMin)) {
+                document.getElementById('salaryError').style.display = 'block';
+                document.getElementById('salaryMax').classList.add('input-error');
+                isValid = false;
+            }
+
+            // Validate description
+            if (!jobDescription.value.trim()) {
+                jobDescription.classList.add('input-error');
+                document.getElementById('jobDescriptionError').style.display = 'block';
+                document.getElementById('jobDescriptionError').textContent = 'This field cannot be empty';
+                isValid = false;
+            } else if (!capitalFirstLetter.test(jobDescription.value.trim()) || 
+                      !singleSpace.test(jobDescription.value.trim()) || 
+                      !containsText.test(jobDescription.value.trim())) {
+                jobDescription.classList.add('input-error');
+                document.getElementById('jobDescriptionError').style.display = 'block';
+                document.getElementById('jobDescriptionError').textContent = 
+                    'Description must start with a capital letter, contain only single spaces, and include meaningful text';
+                isValid = false;
+            }
+
+            if (isValid) {
+                const job = {
+                    title: jobTitle.value.trim(),
+                    type: jobType.value,
+                    location: location.value.trim(),
+                    experience: experienceLevel.value,
+                    currency: 'INR',
+                    minSalary: salaryMin,
+                    maxSalary: salaryMax,
+                    salaryPeriod: document.getElementById('salaryPeriod').value,
+                    description: jobDescription.value.trim(),
+                    skills: document.getElementById('skillsRequired').value.split(',').map(skill => skill.trim()).filter(skill => skill),
+                    benefits: Array.from(document.querySelectorAll('input[name="benefits"]:checked')).map(el => el.value),
+                    postedDate: new Date().toISOString()
+                };
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/jobs', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(job),
+                    });
+
+                    if (response.ok) {
+                        await fetchJobs();
+                        this.reset();
+                        
+                        // Show success animation
+                        const btn = this.querySelector('button[type="submit"]');
+                        btn.innerHTML = '<i class="fas fa-check"></i> Job Posted Successfully!';
+                        btn.style.backgroundColor = '#4bb543';
+                        
+                        setTimeout(() => {
+                            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Job Opportunity';
+                            btn.style.backgroundColor = '';
+                        }, 3000);
+                    } else {
+                        alert('Error posting job');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error posting job');
+                }
+            }
+        });
+
+        async function fetchJobs() {
+            try {
+                // Show loading state
+                document.getElementById('jobsGrid').innerHTML = `
+                    <div class="no-jobs">
+                        <i class="fas fa-spinner fa-spin loading"></i>
+                        <p>Loading jobs...</p>
+                        <p class="subtitle">We're fetching the latest opportunities for you</p>
+                    </div>
+                `;
+
+                const response = await fetch('http://localhost:3000/api/jobs');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const jobs = await response.json();
+                
+                // Verify jobs is an array
+                if (!Array.isArray(jobs)) {
+                    throw new Error('Invalid response: Expected an array of jobs');
+                }
+
+                displayJobs(jobs);
+            } catch (error) {
+                console.error('Error fetching jobs:', error);
+                document.getElementById('jobsGrid').innerHTML = `
+                    <div class="no-jobs">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error loading jobs</p>
+                        <p class="subtitle">Please try again later</p>
+                        <button class="btn btn-view-jobs" onclick="fetchJobs()">
+                            <i class="fas fa-sync-alt"></i>
+                            Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function displayJobs(jobs) {
+            const jobsGrid = document.getElementById('jobsGrid');
+            
+            if (jobs.length === 0) {
+                jobsGrid.innerHTML = `
+                    <div class="no-jobs">
+                        <i class="fas fa-briefcase"></i>
+                        <p>No jobs posted yet</p>
+                        <p class="subtitle">Submit the form above to post your first job opportunity</p>
+                        <button class="btn btn-view-jobs">
+                            <i class="fas fa-arrow-up"></i>
+                            Go to Form
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            jobsGrid.innerHTML = '';
+            
+            jobs.forEach(job => {
+                const jobCard = document.createElement('div');
+                jobCard.className = 'job-card';
+                jobCard.innerHTML = `
+                    <h3 class="job-title">${job.title}</h3>
+                    <div class="job-meta">
+                        <span><i class="fas fa-briefcase"></i> ${formatJobType(job.type)}</span>
+                        <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
+                        <span><i class="fas fa-user-tie"></i> ${formatExperience(job.experience)}</span>
+                    </div>
+                    ${job.skills.length > 0 ? `
+                    <div class="job-skills">
+                        ${job.skills.map(skill => `<span class="skill-tag"><i class="fas fa-code"></i> ${skill}</span>`).join('')}
+                    </div>` : ''}
+                    <div class="job-details" id="details-${job.id}">
+                        <div class="job-description">${job.description}</div>
+                        ${job.benefits.length > 0 ? `
+                        <div class="job-benefits">  
+                            ${job.benefits.map(benefit => `
+                            <span class="benefit-tag">
+                                <i class="fas fa-check-circle"></i>
+                                ${formatBenefit(benefit)}
+                            </span>`).join('')}
+                        </div>` : ''}
+                        ${job.minSalary && job.maxSalary ? `
+                        <div class="job-salary">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Salary: ₹${job.minSalary} - ₹${job.maxSalary} ${formatSalaryPeriod(job.salaryPeriod)}</span>
+                        </div>` : ''}
+                    </div>
+                    <button class="btn btn-outline" onclick="toggleDetails('details-${job.id}')">
+                        <i class="fas fa-eye"></i> View Details
+                    </button>
+                `;
+                jobsGrid.appendChild(jobCard);
+            });
+        }
+
+        function toggleDetails(id) {
+            const details = document.getElementById(id);
+            const button = details.parentElement.querySelector('.btn-outline');
+            if (details.classList.contains('show')) {
+                details.classList.remove('show');
+                button.innerHTML = '<i class="fas fa-eye"></i> View Details';
+            } else {
+                details.classList.add('show');
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Details';
+            }
+        }
+
+        function formatJobType(type) {
+            const types = {
+                'full-time': 'Full-time',
+                'part-time': 'Part-time',
+                'contract': 'Contract',
+                'temporary': 'Temporary',
+                'internship': 'Internship',
+                'remote': 'Remote'
+            };
+            return types[type] || type;
+        }
+        
+        function formatExperience(exp) {
+            const experiences = {
+                'internship': 'Internship',
+                'entry-level': 'Entry Level',
+                'mid-level': 'Mid Level',
+                'senior-level': 'Senior Level',
+                'director': 'Director',
+                'executive': 'Executive'
+            };
+            return experiences[exp] || exp;
+        }
+        
+        function formatBenefit(benefit) {
+            const benefits = {
+                'healthInsurance': 'Health Insurance',
+                'dentalInsurance': 'Dental Insurance',
+                'retirementPlan': 'Retirement Plan',
+                'paidTimeOff': 'Paid Time Off',
+                'flexibleSchedule': 'Flexible Schedule',
+                'remoteWork': 'Remote Work'
+            };
+            return benefits[benefit] || benefit;
+        }
+        
+        function formatSalaryPeriod(period) {
+            const periods = {
+                'year': 'per year',
+                'month': 'per month',
+                'week': 'per week',
+                'hour': 'per hour'
+            };
+            return periods[period] || period;
+        }
+    </script>
+</body>
+</html>
