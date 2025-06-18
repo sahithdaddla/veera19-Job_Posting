@@ -567,7 +567,7 @@
                         <i class="fas fa-heading"></i>
                         Job Title
                     </label>
-                    <input type="text" id="jobTitle" name="jobTitle" placeholder="e.g. Senior Frontend Developer" required>
+                    <input type="text" id="jobTitle" name="jobTitle" placeholder="e.g. Senior Frontend Developer" required maxlength="30">
                     <div class="error-message" id="jobTitleError">Job title must start with a capital letter and contain only single spaces</div>
                 </div>
                 
@@ -593,7 +593,7 @@
                         <i class="fas fa-map-marker-alt"></i>
                         Location
                     </label>
-                    <input type="text" id="location" name="location" placeholder="e.g. Bangalore" required>
+                    <input type="text" id="location" name="location" placeholder="e.g. Bangalore" required maxlength="30">
                     <div class="error-message" id="locationError">Location must start with a capital letter and contain only single spaces</div>
                 </div>
                 
@@ -635,13 +635,13 @@
                 </div>
                 
                 <div class="form-group full-width">
-                    <label for="jobDescription" class="required">
-                        <i class="fas fa-file-alt"></i>
-                        Job Description
-                    </label>
-                    <textarea id="jobDescription" name="jobDescription" placeholder="Describe the responsibilities, requirements, and benefits of this position..." required></textarea>
-                    <div class="error-message" id="jobDescriptionError">Description must start with a capital letter, contain only single spaces, and include meaningful text</div>
-                </div>
+               <label for="jobDescription" class="required">
+                    <i class="fas fa-file-alt"></i>
+                    Job Description
+              </label>
+         <textarea id="jobDescription" name="jobDescription" placeholder="Describe the responsibilities, requirements, and benefits of this position..." required maxlength="255"></textarea>
+       <div class="error-message" id="jobDescriptionError"></div>
+    </div>
                 
                 <div class="form-group full-width">
                     <label>
@@ -692,13 +692,14 @@
                     </div>
                 </div>
                 
-                <div class="form-group full-width">
-                    <label for="skillsRequired">
-                        <i class="fas fa-code"></i>
-                        Skills Required (comma separated)
-                    </label>
-                    <input type="text" id="skillsRequired" name="skillsRequired" placeholder="e.g. JavaScript, React, Node.js, CSS">
-                </div>
+<div class="form-group full-width">
+    <label for="skillsRequired">
+        <i class="fas fa-code"></i>
+        Skills Required (comma separated)
+    </label>
+    <input type="text" id="skillsRequired" name="skillsRequired" placeholder="e.g. JavaScript, React, Node-js, CSS" maxlength="255">
+    <div class="error-message" id="skillsRequiredError"></div>
+</div>
             </div>
             
             <button type="submit" class="btn btn-block">
@@ -728,383 +729,363 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            fetchJobs();
-            
-            // Add click handler for "Go to Form" button
-            document.querySelector('.btn-view-jobs')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.getElementById('jobPostingForm').scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-
-            // Validation regex patterns
-            const capitalFirstLetter = /^[A-Z]/;
-            const singleSpace = /^([A-Za-z0-9]+[ ]{0,1})*[A-Za-z0-9]+$/;
-            const containsText = /[A-Za-z]/;
-
-            // Real-time validation for job title
-            const jobTitle = document.getElementById('jobTitle');
-            jobTitle.addEventListener('input', function() {
-                validateField(jobTitle, 'jobTitleError', 'Job title must start with a capital letter and contain only single spaces');
-            });
-
-            // Real-time validation for location
-            const location = document.getElementById('location');
-            location.addEventListener('input', function() {
-                validateField(location, 'locationError', 'Location must start with a capital letter and contain only single spaces');
-            });
-
-            // Real-time validation for description
-            const jobDescription = document.getElementById('jobDescription');
-            jobDescription.addEventListener('input', function() {
-                validateDescription(jobDescription, 'jobDescriptionError', 
-                    'Description must start with a capital letter, contain only single spaces, and include meaningful text');
-            });
-
-            function validateField(field, errorId, errorMessage) {
-                const value = field.value.trim();
-                const errorElement = document.getElementById(errorId);
-                
-                if (!value) {
-                    field.classList.add('input-error');
-                    errorElement.style.display = 'block';
-                    errorElement.textContent = 'This field cannot be empty';
-                    return false;
-                }
-                
-                if (!capitalFirstLetter.test(value) || !singleSpace.test(value)) {
-                    field.classList.add('input-error');
-                    errorElement.style.display = 'block';
-                    errorElement.textContent = errorMessage;
-                    return false;
-                }
-
-                field.classList.remove('input-error');
-                errorElement.style.display = 'none';
-                return true;
-            }
-
-            function validateDescription(field, errorId, errorMessage) {
-                const value = field.value.trim();
-                const errorElement = document.getElementById(errorId);
-                
-                if (!value) {
-                    field.classList.add('input-error');
-                    errorElement.style.display = 'block';
-                    errorElement.textContent = 'This field cannot be empty';
-                    return false;
-                }
-
-                if (!capitalFirstLetter.test(value) || 
-                    !singleSpace.test(value) || 
-                    !containsText.test(value)) {
-                    field.classList.add('input-error');
-                    errorElement.style.display = 'block';
-                    errorElement.textContent = errorMessage;
-                    return false;
-                }
-
-                field.classList.remove('input-error');
-                errorElement.style.display = 'none';
-                return true;
-            }
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetchJobs();
+    
+    document.querySelector('.btn-view-jobs')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('jobPostingForm').scrollIntoView({
+            behavior: 'smooth'
         });
+    });
 
-        document.getElementById('jobPostingForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            let isValid = true;
-            const jobTitle = document.getElementById('jobTitle');
-            const jobType = document.getElementById('jobType');
-            const location = document.getElementById('location');
-            const experienceLevel = document.getElementById('experienceLevel');
-            const salaryMin = document.getElementById('salaryMin').value;
-            const salaryMax = document.getElementById('salaryMax').value;
-            const salaryPeriod = document.getElementById('salaryPeriod');
-            const jobDescription = document.getElementById('jobDescription');
+    // Validation regex patterns
+    const capitalFirstLetter = /^[A-Z]/;
+    const validCharacters = /^[A-Za-z,-]+$/;
+    const validSkill = /^[A-Za-z-]+$/;
+    const maxLength = 255;
 
-            // Validation regex patterns
-            const capitalFirstLetter = /^[A-Z]/;
-            const singleSpace = /^([A-Za-z0-9]+[ ]{0,1})*[A-Za-z0-9]+$/;
-            const containsText = /[A-Za-z]/;
+    // Real-time validation
+    const jobTitle = document.getElementById('jobTitle');
+    jobTitle.addEventListener('input', function() {
+        validateField(jobTitle, 'jobTitleError', 'Job title must start with a capital letter and contain only alphabetic characters, commas, or dashes');
+    });
 
-            // Reset error states
-            [jobTitle, jobType, location, experienceLevel, jobDescription].forEach(field => {
-                field.classList.remove('input-error');
-                document.getElementById(`${field.id}Error`).style.display = 'none';
-            });
-            document.getElementById('salaryError').style.display = 'none';
+    const location = document.getElementById('location');
+    location.addEventListener('input', function() {
+        validateField(location, 'locationError', 'Location must start with a capital letter and contain only alphabetic characters, commas, or dashes');
+    });
 
-            // Validate job title
-            if (!jobTitle.value.trim()) {
-                jobTitle.classList.add('input-error');
-                document.getElementById('jobTitleError').style.display = 'block';
-                document.getElementById('jobTitleError').textContent = 'This field cannot be empty';
-                isValid = false;
-            } else if (!capitalFirstLetter.test(jobTitle.value.trim()) || !singleSpace.test(jobTitle.value.trim())) {
-                jobTitle.classList.add('input-error');
-                document.getElementById('jobTitleError').style.display = 'block';
-                document.getElementById('jobTitleError').textContent = 
-                    'Job title must start with a capital letter and contain only single spaces';
-                isValid = false;
+    const skillsRequired = document.getElementById('skillsRequired');
+    skillsRequired.addEventListener('input', function() {
+        validateSkills(skillsRequired, 'skillsRequiredError', 'Skills must contain only alphabetic characters or dashes, separated by commas');
+    });
+
+    const jobDescription = document.getElementById('jobDescription');
+    jobDescription.addEventListener('input', function() {
+        validateField(jobDescription, 'jobDescriptionError', 
+            'Description must start with a capital letter and contain only alphabetic characters, commas, or dashes');
+    });
+
+    function validateField(field, errorId, errorMessage) {
+        const value = field.value.trim();
+        const errorElement = document.getElementById(errorId);
+        
+        if (!value) {
+            field.classList.add('input-error');
+            errorElement.style.display = 'block';
+            errorElement.textContent = 'This field cannot be empty';
+            return false;
+        }
+        
+        if (value.length > maxLength) {
+            field.classList.add('input-error');
+            errorElement.style.display = 'block';
+            errorElement.textContent = `Input exceeds maximum length of ${maxLength} characters`;
+            return false;
+        }
+
+        if (!capitalFirstLetter.test(value)) {
+            field.classList.add('input-error');
+            errorElement.style.display = 'block';
+            errorElement.textContent = errorMessage;
+            return false;
+        }
+
+        if (!validCharacters.test(value)) {
+            field.classList.add('input-error');
+            errorElement.style.display = 'block';
+            errorElement.textContent = errorMessage;
+            return false;
+        }
+
+        field.classList.remove('input-error');
+        errorElement.style.display = 'none';
+        return true;
+    }
+
+    function validateSkills(field, errorId, errorMessage) {
+        const value = field.value.trim();
+        const errorElement = document.getElementById(errorId);
+        
+        if (value.length > maxLength) {
+            field.classList.add('input-error');
+            errorElement.style.display = 'block';
+            errorElement.textContent = `Input exceeds maximum length of ${maxLength} characters`;
+            return false;
+        }
+
+        if (value) {
+            const skills = value.split(',').map(skill => skill.trim()).filter(skill => skill);
+            for (let skill of skills) {
+                if (!validSkill.test(skill)) {
+                    field.classList.add('input-error');
+                    errorElement.style.display = 'block';
+                    errorElement.textContent = errorMessage;
+                    return false;
+                }
+                if (skill.length > maxLength) {
+                    field.classList.add('input-error');
+                    errorElement.style.display = 'block';
+                    errorElement.textContent = `Each skill must not exceed ${maxLength} characters`;
+                    return false;
+                }
             }
+        }
 
-            // Validate job type
-            if (!jobType.value) {
-                jobType.classList.add('input-error');
-                document.getElementById('jobTypeError').style.display = 'block';
-                isValid = false;
-            }
+        field.classList.remove('input-error');
+        errorElement.style.display = 'none';
+        return true;
+    }
 
-            // Validate location
-            if (!location.value.trim()) {
-                location.classList.add('input-error');
-                document.getElementById('locationError').style.display = 'block';
-                document.getElementById('locationError').textContent = 'This field cannot be empty';
-                isValid = false;
-            } else if (!capitalFirstLetter.test(location.value.trim()) || !singleSpace.test(location.value.trim())) {
-                location.classList.add('input-error');
-                document.getElementById('locationError').style.display = 'block';
-                document.getElementById('locationError').textContent = 
-                    'Location must start with a capital letter and contain only single spaces';
-                isValid = false;
-            }
+    document.getElementById('jobPostingForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        const jobTitle = document.getElementById('jobTitle');
+        const jobType = document.getElementById('jobType');
+        const location = document.getElementById('location');
+        const experienceLevel = document.getElementById('experienceLevel');
+        const salaryMin = document.getElementById('salaryMin').value;
+        const salaryMax = document.getElementById('salaryMax').value;
+        const salaryPeriod = document.getElementById('salaryPeriod');
+        const jobDescription = document.getElementById('jobDescription');
+        const skillsRequired = document.getElementById('skillsRequired');
 
-            // Validate experience level
-            if (!experienceLevel.value) {
-                experienceLevel.classList.add('input-error');
-                document.getElementById('experienceLevelError').style.display = 'block';
-                isValid = false;
-            }
+        // Reset error states
+        [jobTitle, jobType, location, experienceLevel, jobDescription, skillsRequired].forEach(field => {
+            field.classList.remove('input-error');
+            document.getElementById(`${field.id}Error`).style.display = 'none';
+        });
+        document.getElementById('salaryError').style.display = 'none';
 
-            // Validate salary
-            if (salaryMin && salaryMax && Number(salaryMax) <= Number(salaryMin)) {
-                document.getElementById('salaryError').style.display = 'block';
-                document.getElementById('salaryMax').classList.add('input-error');
-                isValid = false;
-            }
+        // Validate fields
+        if (!validateField(jobTitle, 'jobTitleError', 
+            'Job title must start with a capital letter and contain only alphabetic characters, commas, or dashes')) {
+            isValid = false;
+        }
+        if (!jobType.value) {
+            jobType.classList.add('input-error');
+            document.getElementById('jobTypeError').style.display = 'block';
+            isValid = false;
+        }
+        if (!validateField(location, 'locationError', 
+            'Location must start with a capital letter and contain only alphabetic characters, commas, or dashes')) {
+            isValid = false;
+        }
+        if (!experienceLevel.value) {
+            experienceLevel.classList.add('input-error');
+            document.getElementById('experienceLevelError').style.display = 'block';
+            isValid = false;
+        }
+        if (salaryMin && salaryMax && Number(salaryMax) <= Number(salaryMin)) {
+            document.getElementById('salaryError').style.display = 'block';
+            document.getElementById('salaryMax').classList.add('input-error');
+            isValid = false;
+        }
+        if (!validateField(jobDescription, 'jobDescriptionError', 
+            'Description must start with a capital letter and contain only alphabetic characters, commas, or dashes')) {
+            isValid = false;
+        }
+        if (!validateSkills(skillsRequired, 'skillsRequiredError', 
+            'Skills must contain only alphabetic characters or dashes, separated by commas')) {
+            isValid = false;
+        }
 
-            // Validate description
-            if (!jobDescription.value.trim()) {
-                jobDescription.classList.add('input-error');
-                document.getElementById('jobDescriptionError').style.display = 'block';
-                document.getElementById('jobDescriptionError').textContent = 'This field cannot be empty';
-                isValid = false;
-            } else if (!capitalFirstLetter.test(jobDescription.value.trim()) || 
-                      !singleSpace.test(jobDescription.value.trim()) || 
-                      !containsText.test(jobDescription.value.trim())) {
-                jobDescription.classList.add('input-error');
-                document.getElementById('jobDescriptionError').style.display = 'block';
-                document.getElementById('jobDescriptionError').textContent = 
-                    'Description must start with a capital letter, contain only single spaces, and include meaningful text';
-                isValid = false;
-            }
+        if (isValid) {
+            const job = {
+                title: jobTitle.value.trim(),
+                type: jobType.value,
+                location: location.value.trim(),
+                experience: experienceLevel.value,
+                currency: 'INR',
+                minSalary: salaryMin ? Number(salaryMin) : null,
+                maxSalary: salaryMax ? Number(salaryMax) : null,
+                salaryPeriod: salaryPeriod.value || null,
+                description: jobDescription.value.trim(),
+                skills: skillsRequired.value.split(',').map(skill => skill.trim()).filter(skill => skill),
+                benefits: Array.from(document.querySelectorAll('input[name="benefits"]:checked')).map(el => el.value),
+                postedDate: new Date().toISOString()
+            };
 
-            if (isValid) {
-                const job = {
-                    title: jobTitle.value.trim(),
-                    type: jobType.value,
-                    location: location.value.trim(),
-                    experience: experienceLevel.value,
-                    currency: 'INR',
-                    minSalary: salaryMin,
-                    maxSalary: salaryMax,
-                    salaryPeriod: document.getElementById('salaryPeriod').value,
-                    description: jobDescription.value.trim(),
-                    skills: document.getElementById('skillsRequired').value.split(',').map(skill => skill.trim()).filter(skill => skill),
-                    benefits: Array.from(document.querySelectorAll('input[name="benefits"]:checked')).map(el => el.value),
-                    postedDate: new Date().toISOString()
-                };
+            try {
+                const response = await fetch('http://localhost:3000/api/jobs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(job),
+                });
 
-                try {
-                    const response = await fetch('http://localhost:3000/api/jobs', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(job),
-                    });
-
-                    if (response.ok) {
-                        await fetchJobs();
-                        this.reset();
-                        
-                        // Show success animation
-                        const btn = this.querySelector('button[type="submit"]');
-                        btn.innerHTML = '<i class="fas fa-check"></i> Job Posted Successfully!';
-                        btn.style.backgroundColor = '#4bb543';
-                        
-                        setTimeout(() => {
-                            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Job Opportunity';
-                            btn.style.backgroundColor = '';
-                        }, 3000);
-                    } else {
-                        alert('Error posting job');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
+                if (response.ok) {
+                    await fetchJobs();
+                    this.reset();
+                    const btn = this.querySelector('button[type="submit"]');
+                    btn.innerHTML = '<i class="fas fa-check"></i> Job Posted Successfully!';
+                    btn.style.backgroundColor = '#4bb543';
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Job Opportunity';
+                        btn.style.backgroundColor = '';
+                    }, 3000);
+                } else {
                     alert('Error posting job');
                 }
-            }
-        });
-
-        async function fetchJobs() {
-            try {
-                // Show loading state
-                document.getElementById('jobsGrid').innerHTML = `
-                    <div class="no-jobs">
-                        <i class="fas fa-spinner fa-spin loading"></i>
-                        <p>Loading jobs...</p>
-                        <p class="subtitle">We're fetching the latest opportunities for you</p>
-                    </div>
-                `;
-
-                const response = await fetch('http://localhost:3000/api/jobs');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const jobs = await response.json();
-                
-                // Verify jobs is an array
-                if (!Array.isArray(jobs)) {
-                    throw new Error('Invalid response: Expected an array of jobs');
-                }
-
-                displayJobs(jobs);
             } catch (error) {
-                console.error('Error fetching jobs:', error);
-                document.getElementById('jobsGrid').innerHTML = `
-                    <div class="no-jobs">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Error loading jobs</p>
-                        <p class="subtitle">Please try again later</p>
-                        <button class="btn btn-view-jobs" onclick="fetchJobs()">
-                            <i class="fas fa-sync-alt"></i>
-                            Retry
-                        </button>
-                    </div>
-                `;
+                console.error('Error:', error);
+                alert('Error posting job');
             }
         }
+    });
 
-        function displayJobs(jobs) {
-            const jobsGrid = document.getElementById('jobsGrid');
-            
-            if (jobs.length === 0) {
-                jobsGrid.innerHTML = `
-                    <div class="no-jobs">
-                        <i class="fas fa-briefcase"></i>
-                        <p>No jobs posted yet</p>
-                        <p class="subtitle">Submit the form above to post your first job opportunity</p>
-                        <button class="btn btn-view-jobs">
-                            <i class="fas fa-arrow-up"></i>
-                            Go to Form
-                        </button>
-                    </div>
-                `;
-                return;
+    // Unchanged functions: fetchJobs, displayJobs, toggleDetails, formatJobType, formatExperience, formatBenefit, formatSalaryPeriod
+    async function fetchJobs() {
+        try {
+            document.getElementById('jobsGrid').innerHTML = `
+                <div class="no-jobs">
+                    <i class="fas fa-spinner fa-spin loading"></i>
+                    <p>Loading jobs...</p>
+                    <p class="subtitle">We're fetching the latest opportunities for you</p>
+                </div>
+            `;
+            const response = await fetch('http://localhost:3000/api/jobs');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
-            jobsGrid.innerHTML = '';
-            
-            jobs.forEach(job => {
-                const jobCard = document.createElement('div');
-                jobCard.className = 'job-card';
-                jobCard.innerHTML = `
-                    <h3 class="job-title">${job.title}</h3>
-                    <div class="job-meta">
-                        <span><i class="fas fa-briefcase"></i> ${formatJobType(job.type)}</span>
-                        <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
-                        <span><i class="fas fa-user-tie"></i> ${formatExperience(job.experience)}</span>
-                    </div>
-                    ${job.skills.length > 0 ? `
-                    <div class="job-skills">
-                        ${job.skills.map(skill => `<span class="skill-tag"><i class="fas fa-code"></i> ${skill}</span>`).join('')}
-                    </div>` : ''}
-                    <div class="job-details" id="details-${job.id}">
-                        <div class="job-description">${job.description}</div>
-                        ${job.benefits.length > 0 ? `
-                        <div class="job-benefits">  
-                            ${job.benefits.map(benefit => `
-                            <span class="benefit-tag">
-                                <i class="fas fa-check-circle"></i>
-                                ${formatBenefit(benefit)}
-                            </span>`).join('')}
-                        </div>` : ''}
-                        ${job.minSalary && job.maxSalary ? `
-                        <div class="job-salary">
-                            <i class="fas fa-money-bill-wave"></i>
-                            <span>Salary: ₹${job.minSalary} - ₹${job.maxSalary} ${formatSalaryPeriod(job.salaryPeriod)}</span>
-                        </div>` : ''}
-                    </div>
-                    <button class="btn btn-outline" onclick="toggleDetails('details-${job.id}')">
-                        <i class="fas fa-eye"></i> View Details
+            const jobs = await response.json();
+            if (!Array.isArray(jobs)) {
+                throw new Error('Invalid response: Expected an array of jobs');
+            }
+            displayJobs(jobs);
+        } catch (error) {
+            console.error('Error fetching jobs:', error);
+            document.getElementById('jobsGrid').innerHTML = `
+                <div class="no-jobs">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Error loading jobs</p>
+                    <p class="subtitle">Please try again later</p>
+                    <button class="btn btn-view-jobs" onclick="fetchJobs()">
+                        <i class="fas fa-sync-alt"></i>
+                        Retry
                     </button>
-                `;
-                jobsGrid.appendChild(jobCard);
-            });
+                </div>
+            `;
         }
+    }
 
-        function toggleDetails(id) {
-            const details = document.getElementById(id);
-            const button = details.parentElement.querySelector('.btn-outline');
-            if (details.classList.contains('show')) {
-                details.classList.remove('show');
-                button.innerHTML = '<i class="fas fa-eye"></i> View Details';
-            } else {
-                details.classList.add('show');
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Details';
-            }
+    function displayJobs(jobs) {
+        const jobsGrid = document.getElementById('jobsGrid');
+        if (jobs.length === 0) {
+            jobsGrid.innerHTML = `
+                <div class="no-jobs">
+                    <i class="fas fa-briefcase"></i>
+                    <p>No jobs posted yet</p>
+                    <p class="subtitle">Submit the form above to post your first job opportunity</p>
+                    <button class="btn btn-view-jobs">
+                        <i class="fas fa-arrow-up"></i>
+                        Go to Form
+                    </button>
+                </div>
+            `;
+            return;
         }
+        jobsGrid.innerHTML = '';
+        jobs.forEach(job => {
+            const jobCard = document.createElement('div');
+            jobCard.className = 'job-card';
+            jobCard.innerHTML = `
+                <h3 class="job-title">${job.title}</h3>
+                <div class="job-meta">
+                    <span><i class="fas fa-briefcase"></i> ${formatJobType(job.type)}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
+                    <span><i class="fas fa-user-tie"></i> ${formatExperience(job.experience)}</span>
+                </div>
+                ${job.skills.length > 0 ? `
+                <div class="job-skills">
+                    ${job.skills.map(skill => `<span class="skill-tag"><i class="fas fa-code"></i> ${skill}</span>`).join('')}
+                </div>` : ''}
+                <div class="job-details" id="details-${job.id}">
+                    <div class="job-description">${job.description}</div>
+                    ${job.benefits.length > 0 ? `
+                    <div class="job-benefits">  
+                        ${job.benefits.map(benefit => `
+                        <span class="benefit-tag">
+                            <i class="fas fa-check-circle"></i>
+                            ${formatBenefit(benefit)}
+                        </span>`).join('')}
+                    </div>` : ''}
+                    ${job.minSalary && job.maxSalary ? `
+                    <div class="job-salary">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Salary: ₹${job.minSalary} - ₹${job.maxSalary} ${formatSalaryPeriod(job.salaryPeriod)}</span>
+                    </div>` : ''}
+                </div>
+                <button class="btn btn-outline" onclick="toggleDetails('details-${job.id}')">
+                    <i class="fas fa-eye"></i> View Details
+                </button>
+            `;
+            jobsGrid.appendChild(jobCard);
+        });
+    }
 
-        function formatJobType(type) {
-            const types = {
-                'full-time': 'Full-time',
-                'part-time': 'Part-time',
-                'contract': 'Contract',
-                'temporary': 'Temporary',
-                'internship': 'Internship',
-                'remote': 'Remote'
-            };
-            return types[type] || type;
+    function toggleDetails(id) {
+        const details = document.getElementById(id);
+        const button = details.parentElement.querySelector('.btn-outline');
+        if (details.classList.contains('show')) {
+            details.classList.remove('show');
+            button.innerHTML = '<i class="fas fa-eye"></i> View Details';
+        } else {
+            details.classList.add('show');
+            button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Details';
         }
-        
-        function formatExperience(exp) {
-            const experiences = {
-                'internship': 'Internship',
-                'entry-level': 'Entry Level',
-                'mid-level': 'Mid Level',
-                'senior-level': 'Senior Level',
-                'director': 'Director',
-                'executive': 'Executive'
-            };
-            return experiences[exp] || exp;
-        }
-        
-        function formatBenefit(benefit) {
-            const benefits = {
-                'healthInsurance': 'Health Insurance',
-                'dentalInsurance': 'Dental Insurance',
-                'retirementPlan': 'Retirement Plan',
-                'paidTimeOff': 'Paid Time Off',
-                'flexibleSchedule': 'Flexible Schedule',
-                'remoteWork': 'Remote Work'
-            };
-            return benefits[benefit] || benefit;
-        }
-        
-        function formatSalaryPeriod(period) {
-            const periods = {
-                'year': 'per year',
-                'month': 'per month',
-                'week': 'per week',
-                'hour': 'per hour'
-            };
-            return periods[period] || period;
-        }
-    </script>
+    }
+
+    function formatJobType(type) {
+        const types = {
+            'full-time': 'Full-time',
+            'part-time': 'Part-time',
+            'contract': 'Contract',
+            'temporary': 'Temporary',
+            'internship': 'Internship',
+            'remote': 'Remote'
+        };
+        return types[type] || type;
+    }
+    
+    function formatExperience(exp) {
+        const experiences = {
+            'internship': 'Internship',
+            'entry-level': 'Entry Level',
+            'mid-level': 'Mid Level',
+            'senior-level': 'Senior Level',
+            'director': 'Director',
+            'executive': 'Executive'
+        };
+        return experiences[exp] || exp;
+    }
+    
+    function formatBenefit(benefit) {
+        const benefits = {
+            'healthInsurance': 'Health Insurance',
+            'dentalInsurance': 'Dental Insurance',
+            'retirementPlan': 'Retirement Plan',
+            'paidTimeOff': 'Paid Time Off',
+            'flexibleSchedule': 'Flexible Schedule',
+            'remoteWork': 'Remote Work'
+        };
+        return benefits[benefit] || benefit;
+    }
+    
+    function formatSalaryPeriod(period) {
+        const periods = {
+            'year': 'per year',
+            'month': 'per month',
+            'week': 'per week',
+            'hour': 'per hour'
+        };
+        return periods[period] || period;
+    }
+})
+</script>
 </body>
 </html>

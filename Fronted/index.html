@@ -722,7 +722,7 @@
         </header>
         
         <div class="search-filter">
-            <input type="text" placeholder="🔍 Job title, keywords, or company" id="searchInput">
+            <input type="text" placeholder="🔍 Job title, keywords" id="searchInput">
             <input type="text" placeholder="📍 Location" id="locationInput">
             <select id="jobTypeFilter">
                 <option value="">All Job Types</option>
@@ -759,310 +759,400 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Simulate loading with a slight delay for better UX
-            setTimeout(() => {
-                fetchJobs();
-            }, 800);
-            
-            // Set up event listeners for search/filter
-            document.getElementById('searchBtn').addEventListener('click', fetchJobs);
-            document.getElementById('searchInput').addEventListener('keyup', function(e) {
-                if (e.key === 'Enter') fetchJobs();
-            });
+<script>
+    // Global variables
+    let currentPage = 1;
+    const jobsPerPage = 8;
+    
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initial load with slight delay for better UX
+        setTimeout(fetchJobs, 800);
+        
+        // Set up event listeners with debouncing
+        const debouncedSearch = debounce(fetchJobs, 500);
+        document.getElementById('searchInput').addEventListener('input', debouncedSearch);
+        document.getElementById('locationInput').addEventListener('input', debouncedSearch);
+        document.getElementById('jobTypeFilter').addEventListener('change', fetchJobs);
+        document.getElementById('searchBtn').addEventListener('click', fetchJobs);
+        
+        // Enter key support
+        document.getElementById('searchInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') fetchJobs();
         });
+        document.getElementById('locationInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') fetchJobs();
+        });
+    });
 
-        let currentPage = 1;
-        const jobsPerPage = 8;
-        
-        async function fetchJobs() {
-            try {
-                // Show loading state
-                document.getElementById('jobsGrid').innerHTML = `
-                    <div class="no-jobs">
-                        <i class="fas fa-spinner fa-spin loading"></i>
-                        <h3>Loading job listings...</h3>
-                        <p>We're fetching the latest opportunities for you</p>
-                    </div>
-                `;
-                
-                // In a real app, you would pass search/filter parameters to your API
-                const response = await fetch('http://localhost:3000/api/jobs');
-                const allJobs = await response.json();
-                
-                // Apply simple client-side filtering for demo purposes
-                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-                const locationTerm = document.getElementById('locationInput').value.toLowerCase();
-                const jobTypeFilter = document.getElementById('jobTypeFilter').value;
-                
-                let filteredJobs = allJobs.filter(job => {
-                    const matchesSearch = job.title.toLowerCase().includes(searchTerm) || 
-                                        job.company.toLowerCase().includes(searchTerm) ||
-                                        job.description.toLowerCase().includes(searchTerm);
-                    const matchesLocation = job.location.toLowerCase().includes(locationTerm);
-                    const matchesJobType = !jobTypeFilter || job.type === jobTypeFilter;
-                    
-                    return matchesSearch && matchesLocation && matchesJobType;
-                });
-                
-                displayJobs(filteredJobs);
-                setupPagination(filteredJobs);
-            } catch (error) {
-                console.error('Error fetching jobs:', error);
-                document.getElementById('jobsGrid').innerHTML = `
-                    <div class="no-jobs animate__animated animate__shakeX">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Error loading jobs</h3>
-                        <p>We couldn't load the job listings. Please try again later.</p>
-                        <button class="btn" onclick="fetchJobs()">
-                            <i class="fas fa-sync-alt"></i> Retry
-                        </button>
-                    </div>
-                `;
+    // Debounce function to prevent rapid API calls
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    // Main function to fetch jobs from server
+    async function fetchJobs() {
+        try {
+            // Show loading state
+            showLoadingState();
+            
+            // Get search parameters
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            const locationTerm = document.getElementById('locationInput').value.trim();
+            const jobTypeFilter = document.getElementById('jobTypeFilter').value;
+            
+            // Build query parameters
+            const params = new URLSearchParams();
+            if (searchTerm) params.append('search', searchTerm);
+            if (locationTerm) params.append('location', locationTerm);
+            if (jobTypeFilter) params.append('type', jobTypeFilter);
+            
+            // Fetch jobs with filters
+            const response = await fetch(`http://localhost:3000/api/jobs?${params.toString()}`);
+            
+            if (!response.ok) {
+                throw new Error(`Failed to load jobs: ${response.status}`);
             }
+            
+            const jobs = await response.json();
+            displayJobs(jobs);
+            setupPagination(jobs);
+            
+        } catch (error) {
+            console.error('Error fetching jobs:', error);
+            showErrorState(error);
+        }
+    }
+
+    // Display jobs in the grid
+    function displayJobs(jobs) {
+        const jobsGrid = document.getElementById('jobsGrid');
+        const jobCount = document.getElementById('jobCount');
+        
+        jobCount.textContent = `${jobs.length} ${jobs.length === 1 ? 'job' : 'jobs'} found`;
+        
+        if (jobs.length === 0) {
+            showNoJobsState();
+            return;
         }
         
-        function displayJobs(jobs) {
-            const jobsGrid = document.getElementById('jobsGrid');
-            const jobCount = document.getElementById('jobCount');
-            
-            jobCount.textContent = `${jobs.length} ${jobs.length === 1 ? 'job' : 'jobs'} found`;
-            
-            if (jobs.length === 0) {
-                jobsGrid.innerHTML = `
-                    <div class="no-jobs animate__animated animate__fadeIn">
-                        <i class="far fa-folder-open"></i>
-                        <h3>No jobs found</h3>
-                        <p>We couldn't find any jobs matching your criteria. Try adjusting your search filters.</p>
-                        <button class="btn" onclick="document.getElementById('searchInput').focus()">
-                            <i class="fas fa-search"></i> Modify Search
-                        </button>
-                    </div>
-                `;
-                document.getElementById('pagination').innerHTML = '';
-                return;
-            }
-            
-            // Calculate pagination
-            const startIndex = (currentPage - 1) * jobsPerPage;
-            const paginatedJobs = jobs.slice(startIndex, startIndex + jobsPerPage);
-            
-            jobsGrid.innerHTML = '';
-            
-            paginatedJobs.forEach((job, index) => {
-                const jobCard = document.createElement('div');
-                jobCard.className = `job-card ${job.featured ? 'featured' : ''}`;
-                
-                // Determine benefit class for styling
-                const getBenefitClass = (benefit) => {
-                    if (benefit.includes('Health') || benefit.includes('Insurance')) return 'health';
-                    if (benefit.includes('Retirement') || benefit.includes('401')) return 'retirement';
-                    if (benefit.includes('Bonus') || benefit.includes('Stock')) return 'bonus';
-                    if (benefit.includes('Remote') || benefit.includes('Flexible')) return 'remote';
-                    return '';
-                };
-                
-                jobCard.innerHTML = `
-${job.featured ? '<span class="featured-badge"><i class="fas fa-star"></i> Featured</span>' : ''}
-    <h3 class="job-title">${job.title} ${job.type ? `<span class="job-type-tag ${job.type}">${formatJobType(job.type)}</span>` : ''}</h3>
-                    <div class="job-meta">
-                        <span><i class="fas fa-briefcase"></i> ${formatJobType(job.type)}</span>
-                        <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
-                        <span><i class="fas fa-user-tie"></i> ${formatExperience(job.experience)}</span>
-                        <span><i class="fas fa-calendar-alt"></i> ${formatDate(job.posted_date)}</span>
-                    </div>
-                    ${job.skills && job.skills.length > 0 ? `
-                    <div class="job-skills">
-                        ${job.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
-                    </div>` : ''}
-                    <div class="job-details" id="details-${job.id}">
-                        <div class="job-description">${job.description}</div>
-                        ${job.benefits && job.benefits.length > 0 ? `
-                        <div class="job-benefits">
-                            ${job.benefits.map(benefit => `
-                            <span class="benefit-tag ${getBenefitClass(benefit)}">
-                                <i class="fas ${getBenefitIcon(benefit)}"></i>
-                                ${formatBenefit(benefit)}
-                            </span>`).join('')}
-                        </div>` : ''}
-                        ${job.min_salary && job.max_salary ? `
-                        <div class="job-salary">
-                            <i class="fas fa-money-bill-wave"></i>
-                            ${job.currency}${job.min_salary.toLocaleString()} - ${job.currency}${job.max_salary.toLocaleString()} ${formatSalaryPeriod(job.salary_period)}
-                        </div>` : ''}
-                    </div>
-                    <div class="job-footer">
-                        <button class="btn btn-outline" onclick="toggleDetails('details-${job.id}')">
-                            <i class="fas fa-eye"></i> View Details
-                        </button>
-                        <a href="apply-job.html?jobId=${job.id}" class="btn">
-                            <i class="fas fa-paper-plane"></i> Apply Now
-                        </a>
-                    </div>
-                `;
-                jobsGrid.appendChild(jobCard);
-            });
+        // Calculate pagination
+        const startIndex = (currentPage - 1) * jobsPerPage;
+        const paginatedJobs = jobs.slice(startIndex, startIndex + jobsPerPage);
+        
+        jobsGrid.innerHTML = '';
+        
+        paginatedJobs.forEach(job => {
+            const jobCard = createJobCard(job);
+            jobsGrid.appendChild(jobCard);
+        });
+    }
+
+    // Create HTML for a single job card
+    function createJobCard(job) {
+        const jobCard = document.createElement('div');
+        jobCard.className = 'job-card';
+        
+        jobCard.innerHTML = `
+            <h3 class="job-title">${escapeHtml(job.title)} 
+                <span class="job-type-tag ${escapeHtml(job.type)}">${formatJobType(job.type)}</span>
+            </h3>
+            <div class="job-meta">
+                <span><i class="fas fa-briefcase"></i> ${formatJobType(job.type)}</span>
+                <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(job.location)}</span>
+                <span><i class="fas fa-user-tie"></i> ${formatExperience(job.experience)}</span>
+                <span><i class="fas fa-calendar-alt"></i> ${formatDate(job.posted_date)}</span>
+            </div>
+            ${job.skills && job.skills.length > 0 ? `
+            <div class="job-skills">
+                ${job.skills.map(skill => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join('')}
+            </div>` : ''}
+            <div class="job-details" id="details-${job.id}">
+                <div class="job-description">${escapeHtml(job.description)}</div>
+                ${job.benefits && job.benefits.length > 0 ? `
+                <div class="job-benefits">
+                    ${job.benefits.map(benefit => `
+                    <span class="benefit-tag">
+                        <i class="fas ${getBenefitIcon(benefit)}"></i>
+                        ${formatBenefit(benefit)}
+                    </span>`).join('')}
+                </div>` : ''}
+                ${job.min_salary && job.max_salary ? `
+                <div class="job-salary">
+                    <i class="fas fa-money-bill-wave"></i>
+                    ${job.currency || '$'}${job.min_salary.toLocaleString()} - ${job.currency || '$'}${job.max_salary.toLocaleString()} ${formatSalaryPeriod(job.salary_period)}
+                </div>` : ''}
+            </div>
+            <div class="job-footer">
+                <button class="btn btn-outline" onclick="toggleDetails('details-${job.id}')">
+                    <i class="fas fa-eye"></i> View Details
+                </button>
+                <a href="apply-job.html?jobId=${job.id}" class="btn">
+                    <i class="fas fa-paper-plane"></i> Apply Now
+                </a>
+            </div>
+        `;
+        
+        return jobCard;
+    }
+
+    // Toggle job details visibility
+    function toggleDetails(id) {
+        const details = document.getElementById(id);
+        const button = details.parentElement.querySelector('.btn-outline');
+        if (details.classList.contains('show')) {
+            details.classList.remove('show');
+            button.innerHTML = '<i class="fas fa-eye"></i> View Details';
+        } else {
+            details.classList.add('show');
+            button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Details';
+        }
+    }
+
+    // Set up pagination controls
+    function setupPagination(jobs) {
+        const totalPages = Math.ceil(jobs.length / jobsPerPage);
+        const paginationContainer = document.getElementById('pagination');
+        
+        if (totalPages <= 1) {
+            paginationContainer.innerHTML = '';
+            return;
         }
         
-        function toggleDetails(id) {
-            const details = document.getElementById(id);
-            const button = details.parentElement.querySelector('.btn-outline');
-            if (details.classList.contains('show')) {
-                details.classList.remove('show');
-                button.innerHTML = '<i class="fas fa-eye"></i> View Details';
-            } else {
-                details.classList.add('show');
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Details';
-            }
+        let paginationHTML = '';
+        
+        // Previous button
+        paginationHTML += `
+            <button class="page-btn ${currentPage === 1 ? 'disabled' : ''}" 
+                    onclick="changePage(${currentPage - 1})" 
+                    ${currentPage === 1 ? 'disabled' : ''}>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        `;
+        
+        // Page numbers
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
         }
         
-        function setupPagination(jobs) {
-            const totalPages = Math.ceil(jobs.length / jobsPerPage);
-            const paginationContainer = document.getElementById('pagination');
-            
-            if (totalPages <= 1) {
-                paginationContainer.innerHTML = '';
-                return;
-            }
-            
-            let paginationHTML = '';
-            
-            // Previous button
+        if (startPage > 1) {
             paginationHTML += `
-                <button class="page-btn ${currentPage === 1 ? 'disabled' : ''}" 
-                        onclick="changePage(${currentPage - 1})" 
-                        ${currentPage === 1 ? 'disabled' : ''}>
-                    <i class="fas fa-chevron-left"></i>
+                <button class="page-btn" onclick="changePage(1)">1</button>
+                ${startPage > 2 ? '<span class="page-dots">...</span>' : ''}
+            `;
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+                <button class="page-btn ${i === currentPage ? 'active' : ''}" 
+                        onclick="changePage(${i})">
+                    ${i}
                 </button>
             `;
-            
-            // Page numbers
-            const maxVisiblePages = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-            
-            if (endPage - startPage + 1 < maxVisiblePages) {
-                startPage = Math.max(1, endPage - maxVisiblePages + 1);
-            }
-            
-            if (startPage > 1) {
-                paginationHTML += `
-                    <button class="page-btn" onclick="changePage(1)">1</button>
-                    ${startPage > 2 ? '<span class="page-dots">...</span>' : ''}
-                `;
-            }
-            
-            for (let i = startPage; i <= endPage; i++) {
-                paginationHTML += `
-                    <button class="page-btn ${i === currentPage ? 'active' : ''}" 
-                            onclick="changePage(${i})">
-                        ${i}
-                    </button>
-                `;
-            }
-            
-            if (endPage < totalPages) {
-                paginationHTML += `
-                    ${endPage < totalPages - 1 ? '<span class="page-dots">...</span>' : ''}
-                    <button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>
-                `;
-            }
-            
-            // Next button
+        }
+        
+        if (endPage < totalPages) {
             paginationHTML += `
-                <button class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" 
-                        onclick="changePage(${currentPage + 1})" 
-                        ${currentPage === totalPages ? 'disabled' : ''}>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+                ${endPage < totalPages - 1 ? '<span class="page-dots">...</span>' : ''}
+                <button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>
             `;
-            
-            paginationContainer.innerHTML = paginationHTML;
         }
         
-        function changePage(page) {
-            currentPage = page;
-            fetchJobs();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        // Next button
+        paginationHTML += `
+            <button class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" 
+                    onclick="changePage(${currentPage + 1})" 
+                    ${currentPage === totalPages ? 'disabled' : ''}>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        `;
+        
+        paginationContainer.innerHTML = paginationHTML;
+    }
 
-        function formatJobType(type) {
-            const types = {
-                'full-time': 'Full-time',
-                'part-time': 'Part-time',
-                'contract': 'Contract',
-                'temporary': 'Temporary',
-                'internship': 'Internship',
-                'remote': 'Remote'
-            };
-            return types[type] || type;
+    // Change current page
+    function changePage(page) {
+        currentPage = page;
+        fetchJobs();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Show loading state
+    function showLoadingState() {
+        document.getElementById('jobsGrid').innerHTML = `
+            <div class="no-jobs">
+                <i class="fas fa-spinner fa-spin loading"></i>
+                <h3>Loading job listings...</h3>
+                <p>We're fetching the latest opportunities for you</p>
+            </div>
+        `;
+    }
+
+    // Show no jobs found state
+    function showNoJobsState() {
+        const jobsGrid = document.getElementById('jobsGrid');
+        const searchTerm = document.getElementById('searchInput').value.trim();
+        const locationTerm = document.getElementById('locationInput').value.trim();
+        const jobTypeFilter = document.getElementById('jobTypeFilter').value;
+        
+        let message = 'No jobs found matching your criteria.';
+        let suggestion = 'Try adjusting your search filters.';
+        
+        if (searchTerm || locationTerm || jobTypeFilter) {
+            suggestion = `Try broadening your search${
+                searchTerm ? ` (remove "${escapeHtml(searchTerm)}")` : ''
+            }${
+                locationTerm ? ` or trying a different location` : ''
+            }${
+                jobTypeFilter ? ` or different job type` : ''
+            }.`;
         }
         
-        function formatExperience(exp) {
-            const experiences = {
-                'internship': 'Internship',
-                'entry-level': 'Entry Level',
-                'mid-level': 'Mid Level',
-                'senior-level': 'Senior Level',
-                'director': 'Director',
-                'executive': 'Executive'
-            };
-            return experiences[exp] || exp;
-        }
+        jobsGrid.innerHTML = `
+            <div class="no-jobs">
+                <i class="far fa-folder-open"></i>
+                <h3>${message}</h3>
+                <p>${suggestion}</p>
+                <button class="btn" onclick="resetFilters()">
+                    <i class="fas fa-undo"></i> Reset Filters
+                </button>
+            </div>
+        `;
+        document.getElementById('pagination').innerHTML = '';
+    }
+
+    // Reset all filters
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('locationInput').value = '';
+        document.getElementById('jobTypeFilter').value = '';
+        currentPage = 1;
+        fetchJobs();
+    }
+
+    // Show error state
+    function showErrorState(error) {
+        document.getElementById('jobsGrid').innerHTML = `
+            <div class="no-jobs">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Error loading jobs</h3>
+                <p>${escapeHtml(error.message)}</p>
+                <button class="btn" onclick="fetchJobs()">
+                    <i class="fas fa-sync-alt"></i> Retry
+                </button>
+            </div>
+        `;
+        document.getElementById('jobCount').textContent = '0 jobs found';
+        document.getElementById('pagination').innerHTML = '';
+    }
+
+    // Helper function to escape HTML
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe.toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Format job type for display
+    function formatJobType(type) {
+        const types = {
+            'full-time': 'Full-time',
+            'part-time': 'Part-time',
+            'contract': 'Contract',
+            'temporary': 'Temporary',
+            'internship': 'Internship',
+            'remote': 'Remote'
+        };
+        return types[type] || type;
+    }
+    
+    // Format experience level for display
+    function formatExperience(exp) {
+        const experiences = {
+            'internship': 'Internship',
+            'entry-level': 'Entry Level',
+            'mid-level': 'Mid Level',
+            'senior-level': 'Senior Level',
+            'director': 'Director',
+            'executive': 'Executive'
+        };
+        return experiences[exp] || exp;
+    }
+    
+    // Get icon for benefit
+    function getBenefitIcon(benefit) {
+        const icons = {
+            'healthInsurance': 'fa-heartbeat',
+            'dentalInsurance': 'fa-tooth',
+            'retirementPlan': 'fa-piggy-bank',
+            'paidTimeOff': 'fa-umbrella-beach',
+            'flexibleSchedule': 'fa-clock',
+            'remoteWork': 'fa-laptop-house',
+            'bonuses': 'fa-gift',
+            'stockOptions': 'fa-chart-line',
+            'training': 'fa-graduation-cap'
+        };
+        return icons[benefit] || 'fa-check-circle';
+    }
+    
+    // Format benefit for display
+    function formatBenefit(benefit) {
+        const benefits = {
+            'healthInsurance': 'Health Insurance',
+            'dentalInsurance': 'Dental Insurance',
+            'retirementPlan': '401(k) Matching',
+            'paidTimeOff': 'Paid Time Off',
+            'flexibleSchedule': 'Flexible Hours',
+            'remoteWork': 'Remote Work',
+            'bonuses': 'Performance Bonuses',
+            'stockOptions': 'Stock Options',
+            'training': 'Training Budget'
+        };
+        return benefits[benefit] || benefit;
+    }
+    
+    // Format salary period for display
+    function formatSalaryPeriod(period) {
+        const periods = {
+            'year': 'per year',
+            'month': 'per month',
+            'week': 'per week',
+            'hour': 'per hour'
+        };
+        return periods[period] || period;
+    }
+    
+    // Format date for display
+    function formatDate(dateString) {
+        if (!dateString) return 'Recently';
         
-        function getBenefitIcon(benefit) {
-            const icons = {
-                'healthInsurance': 'fa-heartbeat',
-                'dentalInsurance': 'fa-tooth',
-                'retirementPlan': 'fa-piggy-bank',
-                'paidTimeOff': 'fa-umbrella-beach',
-                'flexibleSchedule': 'fa-clock',
-                'remoteWork': 'fa-laptop-house',
-                'bonuses': 'fa-gift',
-                'stockOptions': 'fa-chart-line',
-                'training': 'fa-graduation-cap'
-            };
-            return icons[benefit] || 'fa-check-circle';
-        }
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
         
-        function formatBenefit(benefit) {
-            const benefits = {
-                'healthInsurance': 'Health Insurance',
-                'dentalInsurance': 'Dental Insurance',
-                'retirementPlan': '401(k) Matching',
-                'paidTimeOff': 'Paid Time Off',
-                'flexibleSchedule': 'Flexible Hours',
-                'remoteWork': 'Remote Work',
-                'bonuses': 'Performance Bonuses',
-                'stockOptions': 'Stock Options',
-                'training': 'Training Budget'
-            };
-            return benefits[benefit] || benefit;
-        }
+        if (diffDays === 0) return 'Today';
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        if (diffDays < 30) return `${Math.floor(diffDays/7)} ${Math.floor(diffDays/7) === 1 ? 'week' : 'weeks'} ago`;
         
-        function formatSalaryPeriod(period) {
-            const periods = {
-                'year': 'per year',
-                'month': 'per month',
-                'week': 'per week',
-                'hour': 'per hour'
-            };
-            return periods[period] || period;
-        }
-        
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-            
-            if (diffDays === 0) return 'Today';
-            if (diffDays === 1) return 'Yesterday';
-            if (diffDays < 7) return `${diffDays} days ago`;
-            if (diffDays < 30) return `${Math.floor(diffDays/7)} ${Math.floor(diffDays/7) === 1 ? 'week' : 'weeks'} ago`;
-            
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        }
-    </script>
+        return date.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined 
+        });
+    }
+</script>
 </body>
 </html>

@@ -5,7 +5,6 @@ const cors = require('cors');
 const app = express();
 const port = 3000;
 
-// PostgreSQL configuration
 const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
@@ -14,17 +13,11 @@ const pool = new Pool({
     port: 5432,
 });
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Create jobs table if it doesn't exist
 async function initializeDatabase() {
     try {
-        // Drop existing table to ensure clean schema
-        // await pool.query('DROP TABLE IF EXISTS jobs CASCADE');
-
-        // Create jobs table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS jobs (
                 id SERIAL PRIMARY KEY,
@@ -49,10 +42,34 @@ async function initializeDatabase() {
     }
 }
 
-// API Routes
 app.get('/api/jobs', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM jobs ORDER BY posted_date DESC');
+        const { search, location, type } = req.query;
+        
+        let query = 'SELECT * FROM jobs';
+        const queryParams = [];
+        const conditions = [];
+
+        if (search) {
+            conditions.push(`title ILIKE $${queryParams.length + 1}`);
+            queryParams.push(`%${search}%`);
+        }
+        if (location) {
+            conditions.push(`location ILIKE $${queryParams.length + 1}`);
+            queryParams.push(`%${location}%`);
+        }
+        if (type) {
+            conditions.push(`type = $${queryParams.length + 1}`);
+            queryParams.push(type);
+        }
+
+        if (conditions.length > 0) {
+            query += ' WHERE ' + conditions.join(' AND ');
+        }
+
+        query += ' ORDER BY posted_date DESC';
+
+        const result = await pool.query(query, queryParams);
         res.json(result.rows);
     } catch (error) {
         console.error('Error fetching jobs:', error);
@@ -87,7 +104,6 @@ app.post('/api/jobs', async (req, res) => {
     }
 });
 
-// Start server
 app.listen(port, async () => {
     await initializeDatabase();
     console.log(`Server running on http://localhost:${port}`);
