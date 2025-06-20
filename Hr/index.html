@@ -742,7 +742,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Validation regex patterns
     const capitalFirstLetter = /^[A-Z]/;
-    const validCharacters = /^[A-Za-z0-9\s.,'"!?()-]+$/;
+   const validCharacters = /^[A-Za-z0-9\s.,'"!?()-]+$/;
     const validSkill = /^[A-Za-z-]+$/;
     const maxLength = 255;
 
@@ -767,48 +767,6 @@ document.addEventListener('DOMContentLoaded', function() {
         validateField(jobDescription, 'jobDescriptionError', 
             'Description must start with a capital letter and contain only alphabetic characters, commas, or dashes');
     });
-    // Replace the existing validateField function for description with:
-function validateDescription(field, errorId, errorMessage) {
-    const value = field.value.trim();
-    const errorElement = document.getElementById(errorId);
-    
-    if (!value) {
-        field.classList.add('input-error');
-        errorElement.style.display = 'block';
-        errorElement.textContent = 'This field cannot be empty';
-        return false;
-    }
-    
-    if (value.length > maxLength) {
-        field.classList.add('input-error');
-        errorElement.style.display = 'block';
-        errorElement.textContent = `Input exceeds maximum length of ${maxLength} characters`;
-        return false;
-    }
-
-    if (!capitalFirstLetter.test(value)) {
-        field.classList.add('input-error');
-        errorElement.style.display = 'block';
-        errorElement.textContent = 'Description must start with a capital letter';
-        return false;
-    }
-
-    field.classList.remove('input-error');
-    errorElement.style.display = 'none';
-    return true;
-}
-
-// Then update the event listener for jobDescription:
-jobDescription.addEventListener('input', function() {
-    validateDescription(jobDescription, 'jobDescriptionError', 
-        'Description must start with a capital letter');
-});
-
-// And update the form submission validation to use validateDescription instead of validateField
-if (!validateDescription(jobDescription, 'jobDescriptionError', 
-    'Description must start with a capital letter')) {
-    isValid = false;
-}
 
     function validateField(field, errorId, errorMessage) {
         const value = field.value.trim();
