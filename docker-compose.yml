@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres-veera19
+    ports:
+      - "5495:5432"
+    environment:
+      POSTGRES_DB: job_post
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql 
+
+  backend:
+    build: ./Backend
+    container_name: backend-veera19
+    ports:
+      - "3066:3066"
+    depends_on:
+      - postgres
+    environment:
+      - PGHOST=postgres
+      - PGUSER=postgres
+      - PGPASSWORD=admin123
+      - PGDATABASE=job_post
+      - PGPORT=5432
+
+  frontend:
+    build: ./Fronted
+    container_name: frontend-veera19
+    ports:
+      - "8245:80"
+    depends_on:
+      - backend
+
+  hr:
+    build: ./Hr
+    container_name: hr-veera19
+    ports:
+      - "8246:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+
