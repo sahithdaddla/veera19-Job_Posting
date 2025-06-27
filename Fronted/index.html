@@ -812,7 +812,7 @@
             if (jobTypeFilter) params.append('type', jobTypeFilter);
             
             // Fetch jobs with filters
-            const response = await fetch(`http://localhost:3000/api/jobs?${params.toString()}`);
+            const response = await fetch(`http://13.60.236.246:3066/api/jobs?${params.toString()}`);
             
             if (!response.ok) {
                 throw new Error(`Failed to load jobs: ${response.status}`);

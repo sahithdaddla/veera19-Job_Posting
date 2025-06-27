@@ -910,7 +910,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             try {
-                const response = await fetch('http://localhost:3000/api/jobs', {
+                const response = await fetch('http://13.60.236.246:3066/api/jobs', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -948,7 +948,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p class="subtitle">We're fetching the latest opportunities for you</p>
                 </div>
             `;
-            const response = await fetch('http://localhost:3000/api/jobs');
+            const response = await fetch('http://13.60.236.246:3066/api/jobs');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
